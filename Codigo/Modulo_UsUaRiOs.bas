@@ -2120,6 +2120,7 @@ Sub WarpUserChar(ByVal Userindex As Integer, _
         Call DoTileEvents(Userindex, Map, X, Y)
         
         'Force a flush, so user index is in there before it's destroyed for teleporting
+        Call FlushBuffer(Userindex)
         
         'Seguis invisible al pasar de mapa
         If (.flags.invisible = 1 Or .flags.Oculto = 1) And (Not .flags.AdminInvisible = 1) Then
