@@ -31,10 +31,9 @@ Option Explicit
 
 #If False Then
 
-    Dim Map, X, Y, body, Clase, race, Email, obj, Length As Variant
+    Dim Map, X, Y, body, clase, race, Email, obj, Length As Variant
 
 #End If
-
 '********** Constantes de dano en render.
 Public Const DAMAGE_PUNAL    As Byte = 1
 Public Const DAMAGE_NORMAL   As Byte = 2
@@ -237,7 +236,7 @@ Public Const LimiteNewbie As Byte = 12
 
 Public Type tCabecera 'Cabecera de los con
 
-    Desc As String * 255
+    desc As String * 255
     crc As Long
     MagicWord As Long
 
@@ -1283,7 +1282,7 @@ End Type
 Public Type tQuest
 
     Nombre As String
-    Desc As String
+    desc As String
     RequiredLevel As Byte
     
     RequiredOBJs As Byte
@@ -1608,10 +1607,10 @@ Public Type User
     CharMimetizado As Char
     OrigChar As Char
     
-    Desc As String ' Descripcion
+    desc As String ' Descripcion
     DescRM As String
     
-    Clase As eClass
+    clase As eClass
     raza As eRaza
     Genero As eGenero
     Email As String
@@ -1786,7 +1785,7 @@ Public Type npc
 
     Name As String
     Char As Char 'Define como se vera
-    Desc As String
+    desc As String
 
     NPCtype As eNPCType
     Numero As Integer

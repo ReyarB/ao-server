@@ -8,7 +8,7 @@ Public Type tMainLoop
 
 End Type
  
-Private Const NumTimers          As Byte = 4
+Private Const NumTimers          As Byte = 5
 
 Public MainLoops(1 To NumTimers) As tMainLoop
 
@@ -18,6 +18,7 @@ Public Enum eTimers
     epacketResend = 2   'Socket
     eAuditoria = 3      'Centinela
     TimerAI = 4         'Npc's
+    eTimerFlush = 5
 
 End Enum
 
@@ -31,6 +32,7 @@ Public Sub MainLoop()
     MainLoops(eTimers.epacketResend).MAXINT = 10
     MainLoops(eTimers.eAuditoria).MAXINT = 1000
     MainLoops(eTimers.TimerAI).MAXINT = 380
+    MainLoops(eTimers.eTimerFlush).MAXINT = 12
     
     prgRun = True
     
@@ -50,9 +52,9 @@ Public Sub MainLoop()
     
 End Sub
  
-Private Sub MakeProcces(ByVal Index As Integer)
+Private Sub MakeProcces(ByVal index As Integer)
     
-    Select Case Index
+    Select Case index
     
         Case eTimers.eGameTimer
             Call GameTimer
@@ -66,9 +68,12 @@ Private Sub MakeProcces(ByVal Index As Integer)
         Case eTimers.TimerAI
             Call TIMER_AI
             
+        Case eTimers.eTimerFlush
+            Call TimerFlush
+            
     End Select
     
-    MainLoops(Index).LastCheck = GetTickCount
+    MainLoops(index).LastCheck = GetTickCount
     
 End Sub
 
@@ -105,7 +110,7 @@ Private Sub packetResend()
     'Last Modification: 04/01/07
     'Attempts to resend to the user all data that may be enqueued.
     '***************************************************
-    On Error GoTo errHandler:
+    On Error GoTo ErrHandler:
 
     Dim i As Long
     
@@ -123,13 +128,37 @@ Private Sub packetResend()
 
     Exit Sub
 
-errHandler:
+ErrHandler:
     LogError ("Error en packetResend - Error: " & Err.Number & " - Desc: " & Err.description)
 
     Resume Next
 
 End Sub
+Private Sub TimerFlush()
+Static lastmovement As Long
+'Debug.Print (GetTickCount - lastmovement)
+'lastmovement = GetTickCount
+    Dim i As Long
+    For i = 1 To MaxUsers
 
+        If UserList(i).ConnIDValida Then
+            If UserList(i).outgoingData.Length > 0 Then
+
+                Dim Ret As Long
+
+                Ret = WsApiEnviar(i, UserList(i).outgoingData.ReadASCIIStringFixed(UserList(i).outgoingData.Length))
+
+                If Ret <> 0 And Ret <> WSAEWOULDBLOCK Then
+                    ' Close the socket avoiding any critical error
+                    Call CloseSocketSL(i)
+                    Call Cerrar_Usuario(i)
+                End If
+            End If
+        End If
+
+    Next i
+    DoEvents
+End Sub
 Private Sub TIMER_AI()
 
     On Error GoTo ErrorHandler
