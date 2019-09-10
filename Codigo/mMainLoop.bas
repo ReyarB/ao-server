@@ -40,7 +40,7 @@ Public Sub MainLoop()
 
         For LoopC = 1 To NumTimers
 
-            If GetTickCount - MainLoops(LoopC).LastCheck >= MainLoops(LoopC).MAXINT Then
+            If timeGetTime > MainLoops(LoopC).LastCheck Then
                 Call MakeProcces(LoopC)
 
             End If
@@ -73,7 +73,7 @@ Private Sub MakeProcces(ByVal index As Integer)
             
     End Select
     
-    MainLoops(index).LastCheck = GetTickCount
+    MainLoops(index).LastCheck = timeGetTime + MainLoops(index).MAXINT
     
 End Sub
 
@@ -162,7 +162,7 @@ Private Sub TIMER_AI()
 
     Dim NpcIndex As Long
 
-    Dim mapa     As Integer
+    Dim Mapa     As Integer
 
     Dim e_p      As Integer
     
@@ -194,10 +194,10 @@ Private Sub TIMER_AI()
 
                             End If
                             
-                            mapa = .Pos.Map
+                            Mapa = .Pos.Map
                             
-                            If mapa > 0 Then
-                                If MapInfo(mapa).NumUsers > 0 Then
+                            If Mapa > 0 Then
+                                If MapInfo(Mapa).NumUsers > 0 Then
                                     If .Movement <> TipoAI.ESTATICO Then
                                         Call NPCAI(NpcIndex)
 

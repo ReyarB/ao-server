@@ -43,6 +43,10 @@ Public Const DAMAGE_CURAR    As Byte = 5
 Public Const DAMAGE_TRABAJO  As Byte = 6
 '********** Constantes de dano en render.
 
+
+Public Declare Function timeGetTime Lib "winmm.dll" () As Long ' timeGetTime
+
+
 ' Nuevo Centinela
 Type CentinelaUser
 
@@ -604,7 +608,7 @@ Public Enum eSkill
     Talar = 9
     Comerciar = 10
     Defensa = 11
-    Pesca = 12
+    pesca = 12
     Mineria = 13
     Carpinteria = 14
     Herreria = 15
