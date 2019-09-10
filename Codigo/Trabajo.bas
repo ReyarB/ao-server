@@ -1364,7 +1364,7 @@ Function ModNavegacion(ByVal clase As eClass, ByVal Userindex As Integer) As Sin
 
         Case eClass.Worker
 
-            If UserList(Userindex).Stats.UserSkills(eSkill.Pesca) = 100 Then
+            If UserList(Userindex).Stats.UserSkills(eSkill.pesca) = 100 Then
                 ModNavegacion = 1.71
             Else
                 ModNavegacion = 2
@@ -1819,7 +1819,7 @@ Public Sub DoPescar(ByVal Userindex As Integer)
 
         End If
     
-        Skill = .Stats.UserSkills(eSkill.Pesca)
+        Skill = .Stats.UserSkills(eSkill.pesca)
         Suerte = Int(-0.00125 * Skill * Skill - 0.3 * Skill + 49)
     
         res = RandomNumber(1, Suerte)
@@ -1854,7 +1854,7 @@ Public Sub DoPescar(ByVal Userindex As Integer)
             'Renderizo el dano en render.
             Call SendData(SendTarget.ToPCArea, Userindex, PrepareMessageCreateDamage(.Pos.X, .Pos.Y, MiObj.Amount, DAMAGE_TRABAJO))
             
-            Call SubirSkill(Userindex, eSkill.Pesca, True)
+            Call SubirSkill(Userindex, eSkill.pesca, True)
         Else
 
             '[CDT 17-02-2004]
@@ -1866,7 +1866,7 @@ Public Sub DoPescar(ByVal Userindex As Integer)
 
             '[/CDT]
         
-            Call SubirSkill(Userindex, eSkill.Pesca, False)
+            Call SubirSkill(Userindex, eSkill.pesca, False)
 
         End If
     
@@ -1920,7 +1920,7 @@ Public Sub DoPescarRed(ByVal Userindex As Integer)
 
         End If
         
-        iSkill = .Stats.UserSkills(eSkill.Pesca)
+        iSkill = .Stats.UserSkills(eSkill.pesca)
         
         ' m = (60-11)/(1-10)
         ' y = mx - m*10 + 11
@@ -1954,7 +1954,7 @@ Public Sub DoPescarRed(ByVal Userindex As Integer)
                 
                 Call WriteConsoleMsg(Userindex, "Has pescado algunos peces!", FontTypeNames.FONTTYPE_INFO)
                 
-                Call SubirSkill(Userindex, eSkill.Pesca, True)
+                Call SubirSkill(Userindex, eSkill.pesca, True)
             Else
 
                 If Not .flags.UltimoMensaje = 6 Then
@@ -1963,7 +1963,7 @@ Public Sub DoPescarRed(ByVal Userindex As Integer)
 
                 End If
                 
-                Call SubirSkill(Userindex, eSkill.Pesca, False)
+                Call SubirSkill(Userindex, eSkill.pesca, False)
 
             End If
 

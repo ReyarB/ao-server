@@ -135,9 +135,6 @@ ErrHandler:
 
 End Sub
 Private Sub TimerFlush()
-Static lastmovement As Long
-'Debug.Print (GetTickCount - lastmovement)
-'lastmovement = GetTickCount
     Dim i As Long
     For i = 1 To MaxUsers
 

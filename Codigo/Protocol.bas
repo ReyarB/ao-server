@@ -86,6 +86,7 @@ Private Enum ServerPacketID
     CharacterMove           ' MP, +, * and _ '
     ForceCharMove
     CharacterChange         ' CP
+    HeadingChange
     ObjectCreate            ' HO
     ObjectDelete            ' BO
     BlockPosition           ' BQ
@@ -3368,7 +3369,7 @@ Private Sub HandleWorkLeftClick(ByVal Userindex As Integer)
 
                 End If
             
-            Case eSkill.Pesca
+            Case eSkill.pesca
                 WeaponIndex = .Invent.WeaponEqpObjIndex
 
                 If WeaponIndex = 0 Then Exit Sub
@@ -21900,7 +21901,6 @@ Public Function PrepareMessageCharacterChange(ByVal body As Integer, _
         Call .WriteInteger(CharIndex)
         Call .WriteInteger(body)
         Call .WriteInteger(Head)
-        Call .WriteByte(heading)
         Call .WriteInteger(weapon)
         Call .WriteInteger(shield)
         Call .WriteInteger(helmet)
@@ -21908,6 +21908,24 @@ Public Function PrepareMessageCharacterChange(ByVal body As Integer, _
         Call .WriteInteger(FXLoops)
         
         PrepareMessageCharacterChange = .ReadASCIIStringFixed(.Length)
+
+    End With
+
+End Function
+Public Function PrepareMessageHeadingChange(ByVal heading As eHeading, _
+                                            ByVal CharIndex As Integer)
+
+    '***************************************************
+    'Author: FrankoH298
+    'Last Modification: 10/09/19
+    'Prepares the "HeadingChange" message and returns it
+    '***************************************************
+    With auxiliarBuffer
+        Call .WriteByte(ServerPacketID.HeadingChange)
+        Call .WriteInteger(CharIndex)
+        Call .WriteByte(heading)
+        
+        PrepareMessageHeadingChange = .ReadASCIIStringFixed(.Length)
 
     End With
 

@@ -315,7 +315,9 @@ Public Sub ChangeUserChar(ByVal Userindex As Integer, _
         .ShieldAnim = Escudo
         .CascoAnim = casco
         
-        Call SendData(SendTarget.ToPCAreaButIndex, Userindex, PrepareMessageCharacterChange(body, Head, heading, .CharIndex, Arma, Escudo, .FX, .loops, casco))
+        Call SendData(SendTarget.ToPCArea, Userindex, PrepareMessageCharacterChange(body, Head, heading, .CharIndex, Arma, Escudo, .FX, .loops, casco))
+        Call SendData(SendTarget.ToPCAreaButIndex, Userindex, PrepareMessageHeadingChange(heading, .CharIndex))
+    
     End With
 
 End Sub
