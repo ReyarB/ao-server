@@ -917,7 +917,6 @@ Public Function HandleIncomingData(ByVal Userindex As Integer) As Boolean
     
     Else
         'Flush buffer - send everything that has been written
-        Call FlushBuffer(Userindex)
 
         HandleIncomingData = False
 
@@ -1590,7 +1589,6 @@ Private Sub HandleLoginExistingChar(ByVal Userindex As Integer)
     
     If Not AsciiValidos(UserName) Then
         Call WriteErrorMsg(Userindex, "Nombre invalido.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         
         Exit Sub
@@ -1599,7 +1597,6 @@ Private Sub HandleLoginExistingChar(ByVal Userindex As Integer)
     
     If Not PersonajeExiste(UserName) Then
         Call WriteErrorMsg(Userindex, "El personaje no existe.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         
         Exit Sub
@@ -1707,7 +1704,6 @@ Private Sub HandleLoginNewChar(ByVal Userindex As Integer)
     
     If PuedeCrearPersonajes = 0 Then
         Call WriteErrorMsg(Userindex, "La creacion de personajes en este servidor se ha deshabilitado.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         
         Exit Sub
@@ -1716,7 +1712,6 @@ Private Sub HandleLoginNewChar(ByVal Userindex As Integer)
     
     If ServerSoloGMs <> 0 Then
         Call WriteErrorMsg(Userindex, "Servidor restringido a administradores. Consulte la pagina oficial o el foro oficial para mas informacion.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         
         Exit Sub
@@ -1725,7 +1720,6 @@ Private Sub HandleLoginNewChar(ByVal Userindex As Integer)
     
     If aClon.MaxPersonajes(UserList(Userindex).ip) Then
         Call WriteErrorMsg(Userindex, "Has creado demasiados personajes.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         
         Exit Sub
@@ -2115,7 +2109,6 @@ Private Sub HandleWhisper(ByVal Userindex As Integer)
                         ElseIf Not (.flags.AdminInvisible = 1) Then
                             Call WriteChatOverHead(Userindex, Chat, .Char.CharIndex, vbBlue)
                             Call WriteChatOverHead(TargetUserIndex, Chat, .Char.CharIndex, vbBlue)
-                            Call FlushBuffer(TargetUserIndex)
                             
                             '[CDT 17-02-2004]
                             If .flags.Privilegios And (PlayerType.User Or PlayerType.Consejero) Then
@@ -2211,7 +2204,7 @@ Private Sub HandleWalk(ByVal Userindex As Integer)
                     If dummy <> 0 Then dummy = 126000 \ dummy
                     
                     Call LogHackAttemp("Tramposo SH: " & .Name & " , " & dummy)
-                    Call SendData(SendTarget.Toadmins, 0, PrepareMessageConsoleMsg("Servidor> " & .Name & " ha sido echado por el servidor por posible uso de SH.", FontTypeNames.FONTTYPE_SERVER))
+                    Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg("Servidor> " & .Name & " ha sido echado por el servidor por posible uso de SH.", FontTypeNames.FONTTYPE_SERVER))
                     Call CloseSocket(Userindex)
                     
                     Exit Sub
@@ -2638,9 +2631,6 @@ Private Sub HandleUserCommerceEnd(ByVal Userindex As Integer)
             If UserList(.ComUsu.DestUsu).ComUsu.DestUsu = Userindex Then
                 Call WriteConsoleMsg(.ComUsu.DestUsu, .Name & " ha dejado de comerciar con vos.", FontTypeNames.FONTTYPE_TALK)
                 Call FinComerciarUsu(.ComUsu.DestUsu)
-                
-                'Send data in the outgoing buffer of the other user
-                Call FlushBuffer(.ComUsu.DestUsu)
 
             End If
 
@@ -2808,9 +2798,6 @@ Private Sub HandleUserCommerceReject(ByVal Userindex As Integer)
             If UserList(otherUser).flags.UserLogged Then
                 Call WriteConsoleMsg(otherUser, .Name & " ha rechazado tu oferta.", FontTypeNames.FONTTYPE_TALK)
                 Call FinComerciarUsu(otherUser)
-                
-                'Send data in the outgoing buffer of the other user
-                Call FlushBuffer(otherUser)
 
             End If
 
@@ -3145,9 +3132,8 @@ Private Sub HandleUseSpellMacro(ByVal Userindex As Integer)
         'Remove packet ID
         Call .incomingData.ReadByte
         
-        Call SendData(SendTarget.Toadmins, Userindex, PrepareMessageConsoleMsg(.Name & " fue expulsado por Anti-macro de hechizos.", FontTypeNames.FONTTYPE_VENENO))
+        Call SendData(SendTarget.ToAdmins, Userindex, PrepareMessageConsoleMsg(.Name & " fue expulsado por Anti-macro de hechizos.", FontTypeNames.FONTTYPE_VENENO))
         Call WriteErrorMsg(Userindex, "Has sido expulsado por usar macro de hechizos. Recomendamos leer el reglamento sobre el tema macros.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
 
     End With
@@ -3666,7 +3652,6 @@ Private Sub HandleWorkLeftClick(ByVal Userindex As Integer)
                             
                             ''FUISTE
                             Call WriteErrorMsg(Userindex, "Has sido expulsado por el sistema anti cheats.")
-                            Call FlushBuffer(Userindex)
                             Call CloseSocket(Userindex)
                             Exit Sub
 
@@ -4558,7 +4543,6 @@ Private Sub HandleUserCommerceOffer(ByVal Userindex As Integer)
         
             If tUser <= 0 Or tUser > MaxUsers Then
                 Call FinComerciarUsu(tUser)
-                Call Protocol.FlushBuffer(tUser)
 
             End If
         
@@ -7598,7 +7582,7 @@ Private Sub HandleGMRequest(ByVal Userindex As Integer)
             Call Ayuda.Push(.Name)
             Call WriteConsoleMsg(Userindex, "Ya habias mandado un mensaje, tu mensaje ha sido movido al final de la cola de mensajes.", FontTypeNames.FONTTYPE_INFO)
         End If
-        Call SendData(SendTarget.Toadmins, 0, PrepareMessageConsoleMsg(.Name + " ha solicitado la ayuda de algun GM", FontTypeNames.FONTTYPE_CENTINELA), False)
+        Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg(.Name + " ha solicitado la ayuda de algun GM", FontTypeNames.FONTTYPE_CENTINELA), False)
     End With
 
 End Sub
@@ -8426,7 +8410,7 @@ Private Sub HandleDenounce(ByVal Userindex As Integer)
             
             msg = LCase$(.Name) & " DENUNCIA: " & Text
             
-            Call SendData(SendTarget.Toadmins, 0, PrepareMessageConsoleMsg(msg, FontTypeNames.FONTTYPE_GUILDMSG), True)
+            Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg(msg, FontTypeNames.FONTTYPE_GUILDMSG), True)
             
             Call Denuncias.Push(msg, False)
             
@@ -8955,7 +8939,7 @@ Private Sub HandleGMMessage(ByVal Userindex As Integer)
                 'Analize chat...
                 Call Statistics.ParseChat(Message)
             
-                Call SendData(SendTarget.Toadmins, 0, PrepareMessageConsoleMsg(.Name & "> " & Message, FontTypeNames.FONTTYPE_GMMSG))
+                Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg(.Name & "> " & Message, FontTypeNames.FONTTYPE_GMMSG))
 
             End If
 
@@ -9766,9 +9750,6 @@ Private Sub HandleSilence(ByVal Userindex As Integer)
                     Call WriteConsoleMsg(Userindex, "Usuario silenciado.", FontTypeNames.FONTTYPE_INFO)
                     Call WriteShowMessageBox(tUser, "Estimado usuario, ud. ha sido silenciado por los administradores. Sus denuncias seran ignoradas por el servidor de aqui en mas. Utilice /GM para contactar un administrador.")
                     Call LogGM(.Name, "/silenciar " & UserList(tUser).Name)
-                
-                    'Flush the other user's buffer
-                    Call FlushBuffer(tUser)
                 Else
                     UserList(tUser).flags.Silenciado = 0
                     Call WriteConsoleMsg(Userindex, "Usuario des silenciado.", FontTypeNames.FONTTYPE_INFO)
@@ -9996,7 +9977,6 @@ Private Sub HandleGoToChar(ByVal Userindex As Integer)
                     
                     If .flags.AdminInvisible = 0 Then
                         Call WriteConsoleMsg(tUser, .Name & " se ha trasportado hacia donde te encuentras.", FontTypeNames.FONTTYPE_INFO)
-                        Call FlushBuffer(tUser)
 
                     End If
                     
@@ -11689,8 +11669,6 @@ Private Sub HandleReviveChar(ByVal Userindex As Integer)
                 End With
                 
                 Call WriteUpdateHP(tUser)
-                
-                Call FlushBuffer(tUser)
                 
                 Call LogGM(.Name, "Resucito a " & UserName)
 
@@ -13955,7 +13933,6 @@ Private Sub HandleMakeDumbNoMore(ByVal Userindex As Integer)
                 Call WriteConsoleMsg(Userindex, "Usuario offline.", FontTypeNames.FONTTYPE_INFO)
             Else
                 Call WriteDumbNoMore(tUser)
-                Call FlushBuffer(tUser)
 
             End If
 
@@ -14403,7 +14380,7 @@ Private Sub HandleBanIP(ByVal Userindex As Integer)
                     Call WriteConsoleMsg(Userindex, "La IP " & bannedIP & " ya se encuentra en la lista de bans.", FontTypeNames.FONTTYPE_INFO)
                 Else
                     Call BanIpAgrega(bannedIP)
-                    Call SendData(SendTarget.Toadmins, 0, PrepareMessageConsoleMsg(.Name & " baneo la IP " & bannedIP & " por " & Reason, FontTypeNames.FONTTYPE_FIGHT))
+                    Call SendData(SendTarget.ToAdmins, 0, PrepareMessageConsoleMsg(.Name & " baneo la IP " & bannedIP & " por " & Reason, FontTypeNames.FONTTYPE_FIGHT))
                     
                     'Find every player with that ip and ban him!
                     For i = 1 To LastUser
@@ -14672,7 +14649,6 @@ Private Sub HandleChaosLegionKick(ByVal Userindex As Integer)
                 UserList(tUser).Faccion.Reenlistadas = 200
                 Call WriteConsoleMsg(Userindex, UserName & " expulsado de las fuerzas del caos y prohibida la reenlistada.", FontTypeNames.FONTTYPE_INFO)
                 Call WriteConsoleMsg(tUser, .Name & " te ha expulsado en forma definitiva de las fuerzas del caos.", FontTypeNames.FONTTYPE_FIGHT)
-                Call FlushBuffer(tUser)
             Else
 
                 If PersonajeExiste(UserName) Then
@@ -14765,7 +14741,7 @@ Private Sub HandleRoyalArmyKick(ByVal Userindex As Integer)
                 UserList(tUser).Faccion.Reenlistadas = 200
                 Call WriteConsoleMsg(Userindex, UserName & " expulsado de las fuerzas reales y prohibida la reenlistada.", FontTypeNames.FONTTYPE_INFO)
                 Call WriteConsoleMsg(tUser, .Name & " te ha expulsado en forma definitiva de las fuerzas reales.", FontTypeNames.FONTTYPE_FIGHT)
-                Call FlushBuffer(tUser)
+            
             Else
 
                 If PersonajeExiste(UserName) Then
@@ -22662,7 +22638,6 @@ Private Sub HandleLoginExistingAccount(ByVal Userindex As Integer)
 
     If Not CuentaExiste(UserName) Then
         Call WriteErrorMsg(Userindex, "La cuenta no existe.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         Exit Sub
 
@@ -22735,7 +22710,6 @@ Private Sub HandleLoginNewAccount(ByVal Userindex As Integer)
 
     If CuentaExiste(UserName) Then
         Call WriteErrorMsg(Userindex, "La cuenta ya existe.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         Exit Sub
     End If
@@ -23352,7 +23326,6 @@ Public Sub HandleCambiarContrasena(ByVal Userindex As Integer)
             'Correo = UserName es lo mismo para aca el Jopi le puso correo :)
             If Not CuentaExiste(Correo) Then
                 Call WriteErrorMsg(Userindex, "La cuenta no existe.")
-                Call FlushBuffer(Userindex)
                 Call CloseSocket(Userindex)
                 Exit Sub
 
@@ -23372,7 +23345,6 @@ Public Sub HandleCambiarContrasena(ByVal Userindex As Integer)
         'Por ultimo limpia el buffer nunca poner exit sub antes de limpiar el buffer porque explota
         Call .incomingData.CopyBuffer(buffer)
         
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         
     End With
@@ -23381,7 +23353,6 @@ ErrHandler:
     
     Dim Error As Long: Error = Err.Number
     
-    Call FlushBuffer(Userindex)
     Call CloseSocket(Userindex)
     
     On Error GoTo 0
@@ -23491,9 +23462,9 @@ On Error GoTo 0
         Err.Raise Error
 End Sub
 
-Private Sub HandleCloseGuild(ByVal UserIndex As Integer)
+Private Sub HandleCloseGuild(ByVal Userindex As Integer)
     
-    With UserList(UserIndex)
+    With UserList(Userindex)
     
         Call .incomingData.ReadByte
         

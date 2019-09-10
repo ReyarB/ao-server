@@ -31,7 +31,7 @@ Option Explicit
 
 #If False Then
 
-    Dim X, Y, Map, K, ErrHandler, Obj, index, n, Email As Variant
+    Dim X, Y, Map, K, ErrHandler, obj, index, n, Email As Variant
 
 #End If
 
@@ -242,7 +242,7 @@ Sub EnviarSpawnList(ByVal Userindex As Integer)
 
 End Sub
 
-Sub ConfigListeningSocket(ByRef Obj As Object, ByVal Port As Integer)
+Sub ConfigListeningSocket(ByRef obj As Object, ByVal Port As Integer)
     '***************************************************
     'Author: Unknown
     'Last Modification: -
@@ -251,15 +251,15 @@ Sub ConfigListeningSocket(ByRef Obj As Object, ByVal Port As Integer)
 
     #If UsarQueSocket = 0 Then
 
-        Obj.AddressFamily = AF_INET
-        Obj.Protocol = IPPROTO_IP
-        Obj.SocketType = SOCK_STREAM
-        Obj.Binary = False
-        Obj.Blocking = False
-        Obj.BufferSize = 1024
-        Obj.LocalPort = Port
-        Obj.backlog = 5
-        Obj.listen
+        obj.AddressFamily = AF_INET
+        obj.Protocol = IPPROTO_IP
+        obj.SocketType = SOCK_STREAM
+        obj.Binary = False
+        obj.Blocking = False
+        obj.BufferSize = 1024
+        obj.LocalPort = Port
+        obj.backlog = 5
+        obj.listen
 
     #End If
 
@@ -1328,7 +1328,6 @@ Public Sub EfectoLluvia(ByVal Userindex As Integer)
 
             modifi = Porcentaje(UserList(Userindex).Stats.MaxSta, 3)
             Call QuitarSta(Userindex, modifi)
-            Call FlushBuffer(Userindex)
 
         End If
 
@@ -1992,7 +1991,6 @@ Sub PasarSegundo()
                     If .Counters.Salir <= 0 Then
                         Call WriteConsoleMsg(i, "Gracias por jugar Argentum Online", FontTypeNames.FONTTYPE_INFO)
                         Call WriteDisconnect(i)
-                        Call FlushBuffer(i)
                         
                         Call CloseSocket(i)
 
@@ -2026,7 +2024,6 @@ Sub PasarSegundo()
                             .Counters.Pena = 0
                             Call WarpUserChar(i, Libertad.Map, Libertad.X, Libertad.Y, True)
                             Call WriteConsoleMsg(i, "Has sido liberado!", FontTypeNames.FONTTYPE_INFO)
-                            Call FlushBuffer(i)
 
                         End If
 
@@ -2054,7 +2051,6 @@ Sub PasarSegundo()
                                     Call Encarcelar(i, MinutosCarcelPiquete)
                                 End If
                                 
-                            Call FlushBuffer(i)
                         Else
                             .Counters.PiqueteC = 0
 
@@ -2162,7 +2158,7 @@ Sub SaveUser(ByVal Userindex As Integer, Optional ByVal SaveTimeOnline As Boolea
 
     With UserList(Userindex)
 
-        If .Clase = 0 Or .Stats.ELV = 0 Then
+        If .clase = 0 Or .Stats.ELV = 0 Then
             Call LogCriticEvent("Estoy intentantdo guardar un usuario nulo de nombre: " & .Name)
             Exit Sub
 

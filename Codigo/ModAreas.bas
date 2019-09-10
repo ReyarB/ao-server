@@ -156,9 +156,9 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
     '15/07/2009: ZaMa - Now it doesn't send an invisible admin char info
     '28/10/2010: ZaMa - Now it doesn't send a saling char invisible message.
     '**************************************************************
-    If UserList(Userindex).AreasInfo.AreaID = AreasInfo(UserList(Userindex).Pos.x, UserList(Userindex).Pos.Y) Then Exit Sub
+    If UserList(Userindex).AreasInfo.AreaID = AreasInfo(UserList(Userindex).Pos.X, UserList(Userindex).Pos.Y) Then Exit Sub
     
-    Dim MinX    As Long, MaxX As Long, MinY As Long, MaxY As Long, x As Long, Y As Long
+    Dim MinX    As Long, MaxX As Long, MinY As Long, MaxY As Long, X As Long, Y As Long
 
     Dim TempInt As Long, Map As Long
     
@@ -199,7 +199,7 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
             MinY = ((.Pos.Y \ 9) - 1) * 9
             MaxY = MinY + 26
             
-            MinX = ((.Pos.x \ 9) - 1) * 9
+            MinX = ((.Pos.X \ 9) - 1) * 9
             MaxX = MinX + 26
             
             .AreasInfo.MinX = CInt(MinX)
@@ -218,19 +218,19 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
         Call WriteAreaChanged(Userindex)
         
         'Actualizamos!!!
-        For x = MinX To MaxX
+        For X = MinX To MaxX
             For Y = MinY To MaxY
                 
                 '<<< User >>>
-                If MapData(Map, x, Y).Userindex Then
+                If MapData(Map, X, Y).Userindex Then
                     
-                    TempInt = MapData(Map, x, Y).Userindex
+                    TempInt = MapData(Map, X, Y).Userindex
                     
                     If Userindex <> TempInt Then
                         
                         ' Solo avisa al otro cliente si no es un admin invisible
                         If Not (UserList(TempInt).flags.AdminInvisible = 1) Then
-                            Call MakeUserChar(False, Userindex, TempInt, Map, x, Y)
+                            Call MakeUserChar(False, Userindex, TempInt, Map, X, Y)
                             
                             ' Si esta navegando, siempre esta visible
                             If UserList(TempInt).flags.Navegando = 0 Then
@@ -250,7 +250,7 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
                     
                         ' Solo avisa al otro cliente si no es un admin invisible
                         If Not (.flags.AdminInvisible = 1) Then
-                            Call MakeUserChar(False, TempInt, Userindex, .Pos.Map, .Pos.x, .Pos.Y)
+                            Call MakeUserChar(False, TempInt, Userindex, .Pos.Map, .Pos.X, .Pos.Y)
                             
                             ' Si esta navegando, siempre esta visible
                             If .flags.Navegando = 0 Then
@@ -266,12 +266,11 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
 
                         End If
                         
-                        Call FlushBuffer(TempInt)
                     
                     ElseIf Head = USER_NUEVO Then
 
                         If Not ButIndex Then
-                            Call MakeUserChar(False, Userindex, Userindex, Map, x, Y)
+                            Call MakeUserChar(False, Userindex, Userindex, Map, X, Y)
 
                         End If
 
@@ -280,21 +279,21 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
                 End If
                 
                 '<<< Npc >>>
-                If MapData(Map, x, Y).NpcIndex Then
-                    Call MakeNPCChar(False, Userindex, MapData(Map, x, Y).NpcIndex, Map, x, Y)
+                If MapData(Map, X, Y).NpcIndex Then
+                    Call MakeNPCChar(False, Userindex, MapData(Map, X, Y).NpcIndex, Map, X, Y)
 
                 End If
                  
                 '<<< Item >>>
-                If MapData(Map, x, Y).ObjInfo.ObjIndex Then
-                    TempInt = MapData(Map, x, Y).ObjInfo.ObjIndex
+                If MapData(Map, X, Y).ObjInfo.ObjIndex Then
+                    TempInt = MapData(Map, X, Y).ObjInfo.ObjIndex
 
                     If Not EsObjetoFijo(ObjData(TempInt).OBJType) Then
-                        Call WriteObjectCreate(Userindex, ObjData(TempInt).GrhIndex, x, Y)
+                        Call WriteObjectCreate(Userindex, ObjData(TempInt).GrhIndex, X, Y)
                         
                         If ObjData(TempInt).OBJType = eOBJType.otPuertas Then
-                            Call Bloquear(False, Userindex, x, Y, MapData(Map, x, Y).Blocked)
-                            Call Bloquear(False, Userindex, x - 1, Y, MapData(Map, x - 1, Y).Blocked)
+                            Call Bloquear(False, Userindex, X, Y, MapData(Map, X, Y).Blocked)
+                            Call Bloquear(False, Userindex, X - 1, Y, MapData(Map, X - 1, Y).Blocked)
 
                         End If
 
@@ -303,10 +302,10 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
                 End If
             
             Next Y
-        Next x
+        Next X
         
         'Precalculados :P
-        TempInt = .Pos.x \ 9
+        TempInt = .Pos.X \ 9
         .AreasInfo.AreaReciveX = AreasRecive(TempInt)
         .AreasInfo.AreaPerteneceX = 2 ^ TempInt
         
@@ -314,7 +313,7 @@ Public Sub CheckUpdateNeededUser(ByVal Userindex As Integer, _
         .AreasInfo.AreaReciveY = AreasRecive(TempInt)
         .AreasInfo.AreaPerteneceY = 2 ^ TempInt
         
-        .AreasInfo.AreaID = AreasInfo(.Pos.x, .Pos.Y)
+        .AreasInfo.AreaID = AreasInfo(.Pos.X, .Pos.Y)
 
     End With
 
@@ -327,9 +326,9 @@ Public Sub CheckUpdateNeededNpc(ByVal NpcIndex As Integer, ByVal Head As Byte)
     'Last Modify Date: Unknow
     ' Se llama cuando se mueve un Npc
     '**************************************************************
-    If Npclist(NpcIndex).AreasInfo.AreaID = AreasInfo(Npclist(NpcIndex).Pos.x, Npclist(NpcIndex).Pos.Y) Then Exit Sub
+    If Npclist(NpcIndex).AreasInfo.AreaID = AreasInfo(Npclist(NpcIndex).Pos.X, Npclist(NpcIndex).Pos.Y) Then Exit Sub
     
-    Dim MinX    As Long, MaxX As Long, MinY As Long, MaxY As Long, x As Long, Y As Long
+    Dim MinX    As Long, MaxX As Long, MinY As Long, MaxY As Long, X As Long, Y As Long
 
     Dim TempInt As Long
     
@@ -370,7 +369,7 @@ Public Sub CheckUpdateNeededNpc(ByVal NpcIndex As Integer, ByVal Head As Byte)
             MinY = ((.Pos.Y \ 9) - 1) * 9
             MaxY = MinY + 26
             
-            MinX = ((.Pos.x \ 9) - 1) * 9
+            MinX = ((.Pos.X \ 9) - 1) * 9
             MaxX = MinX + 26
             
             .AreasInfo.MinX = CInt(MinX)
@@ -386,17 +385,17 @@ Public Sub CheckUpdateNeededNpc(ByVal NpcIndex As Integer, ByVal Head As Byte)
         'Actualizamos!!!
         If MapInfo(.Pos.Map).NumUsers <> 0 Then
 
-            For x = MinX To MaxX
+            For X = MinX To MaxX
                 For Y = MinY To MaxY
 
-                    If MapData(.Pos.Map, x, Y).Userindex Then Call MakeNPCChar(False, MapData(.Pos.Map, x, Y).Userindex, NpcIndex, .Pos.Map, .Pos.x, .Pos.Y)
+                    If MapData(.Pos.Map, X, Y).Userindex Then Call MakeNPCChar(False, MapData(.Pos.Map, X, Y).Userindex, NpcIndex, .Pos.Map, .Pos.X, .Pos.Y)
                 Next Y
-            Next x
+            Next X
 
         End If
         
         'Precalculados :P
-        TempInt = .Pos.x \ 9
+        TempInt = .Pos.X \ 9
         .AreasInfo.AreaReciveX = AreasRecive(TempInt)
         .AreasInfo.AreaPerteneceX = 2 ^ TempInt
             
@@ -404,7 +403,7 @@ Public Sub CheckUpdateNeededNpc(ByVal NpcIndex As Integer, ByVal Head As Byte)
         .AreasInfo.AreaReciveY = AreasRecive(TempInt)
         .AreasInfo.AreaPerteneceY = 2 ^ TempInt
         
-        .AreasInfo.AreaID = AreasInfo(.Pos.x, .Pos.Y)
+        .AreasInfo.AreaID = AreasInfo(.Pos.X, .Pos.Y)
 
     End With
 

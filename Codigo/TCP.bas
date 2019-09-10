@@ -597,7 +597,7 @@ Sub ConnectNewUser(ByVal Userindex As Integer, _
         .Reputacion.Promedio = 30 / 6
     
         .Name = Name
-        .Clase = UserClase
+        .clase = UserClase
         .raza = UserRaza
         .Genero = UserSexo
         .Hogar = Hogar
@@ -1008,7 +1008,6 @@ Sub ConnectAccount(ByVal Userindex As Integer, _
 
     If oSHA256.SHA256(Password & Salt) <> GetAccountPassword(UserName) Then
         Call WriteErrorMsg(Userindex, "Password incorrecto.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         Exit Sub
 
@@ -1068,7 +1067,6 @@ End Sub
                     If UserList(.ComUsu.DestUsu).ComUsu.DestUsu = Userindex Then
                         Call WriteConsoleMsg(.ComUsu.DestUsu, "Comercio cancelado por el otro usuario", FontTypeNames.FONTTYPE_TALK)
                         Call FinComerciarUsu(.ComUsu.DestUsu)
-                        Call FlushBuffer(.ComUsu.DestUsu)
 
                     End If
 
@@ -1258,11 +1256,11 @@ Public Function EnviarDatosASlot(ByVal Userindex As Integer, _
 
         On Error GoTo Err
     
-        Dim ret As Long
+        Dim Ret As Long
     
-        ret = WsApiEnviar(Userindex, Datos)
+        Ret = WsApiEnviar(Userindex, Datos)
     
-        If ret <> 0 And ret <> WSAEWOULDBLOCK Then
+        If Ret <> 0 And Ret <> WSAEWOULDBLOCK Then
             ' Close the socket avoiding any critical error
             Call CloseSocketSL(Userindex)
             Call Cerrar_Usuario(Userindex)
@@ -1294,14 +1292,14 @@ Err:
         '--1) WSAEWOULDBLOCK
         '--2) ERROR
     
-        Dim ret As Long
+        Dim Ret As Long
 
-        ret = frmMain.Serv.Enviar(.ConnID, Datos, Len(Datos))
+        Ret = frmMain.Serv.Enviar(.ConnID, Datos, Len(Datos))
             
-        If ret = 1 Then
+        If Ret = 1 Then
             ' WSAEWOULDBLOCK, put the data again in the outgoingData Buffer
             Call .outgoingData.WriteASCIIStringFixed(Datos)
-        ElseIf ret = 2 Then
+        ElseIf Ret = 2 Then
             'Close socket avoiding any critical error
             Call CloseSocketSL(Userindex)
             Call Cerrar_Usuario(Userindex)
@@ -1460,7 +1458,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
         'Controlamos no pasar el maximo de usuarios
         If NumUsers >= MaxUsers Then
             Call WriteErrorMsg(Userindex, "El servidor ha alcanzado el maximo de usuarios soportado, por favor vuelva a intertarlo mas tarde.")
-            Call FlushBuffer(Userindex)
             Call CloseSocket(Userindex)
             Exit Sub
 
@@ -1470,7 +1467,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
         If AllowMultiLogins = 0 Then
             If CheckForSameIP(Userindex, .ip) = True Then
                 Call WriteErrorMsg(Userindex, "No es posible usar mas de un personaje al mismo tiempo.")
-                Call FlushBuffer(Userindex)
                 Call CloseSocket(Userindex)
                 Exit Sub
 
@@ -1481,7 +1477,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
         'Existe el personaje?
         If Not PersonajeExiste(Name) Then
             Call WriteErrorMsg(Userindex, "El personaje no existe.")
-            Call FlushBuffer(Userindex)
             Call CloseSocket(Userindex)
             Exit Sub
 
@@ -1490,7 +1485,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
         'Es el passwd valido?
         If Not PersonajePerteneceCuenta(Name, AccountHash) Then
             Call WriteErrorMsg(Userindex, "Ha ocurrido un error, por favor inicie sesion nuevamente.")
-            Call FlushBuffer(Userindex)
             Call CloseSocket(Userindex)
             Exit Sub
 
@@ -1505,7 +1499,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
                 Call Cerrar_Usuario(NameIndex(Name))
             End If
 
-            Call FlushBuffer(Userindex)
             'Call CloseSocket(Userindex) 'QUITADO PARA QUE NO CIERRE LA CONEXION AL TIRARSE EL MENSAJE
             Exit Sub
 
@@ -1545,7 +1538,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
         If ServerSoloGMs > 0 Then
             If (.flags.Privilegios And (PlayerType.Admin Or PlayerType.Dios Or PlayerType.SemiDios Or PlayerType.Consejero)) = 0 Then
                 Call WriteErrorMsg(Userindex, "Servidor restringido a administradores. Por favor reintente en unos momentos.")
-                Call FlushBuffer(Userindex)
                 Call CloseSocket(Userindex)
                 Exit Sub
 
@@ -1699,7 +1691,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
                         If UserList(UserList(MapData(mapa, .Pos.X, .Pos.Y).Userindex).ComUsu.DestUsu).flags.UserLogged Then
                             Call FinComerciarUsu(UserList(MapData(mapa, .Pos.X, .Pos.Y).Userindex).ComUsu.DestUsu)
                             Call WriteConsoleMsg(UserList(MapData(mapa, .Pos.X, .Pos.Y).Userindex).ComUsu.DestUsu, "Comercio cancelado. El otro usuario se ha desconectado.", FontTypeNames.FONTTYPE_TALK)
-                            Call FlushBuffer(UserList(MapData(mapa, .Pos.X, .Pos.Y).Userindex).ComUsu.DestUsu)
 
                         End If
 
@@ -1707,7 +1698,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
                         If UserList(MapData(mapa, .Pos.X, .Pos.Y).Userindex).flags.UserLogged Then
                             Call FinComerciarUsu(MapData(mapa, .Pos.X, .Pos.Y).Userindex)
                             Call WriteErrorMsg(MapData(mapa, .Pos.X, .Pos.Y).Userindex, "Alguien se ha conectado donde te encontrabas, por favor reconectate...")
-                            Call FlushBuffer(MapData(mapa, .Pos.X, .Pos.Y).Userindex)
 
                         End If
 
@@ -1799,7 +1789,6 @@ Sub ConnectUser(ByVal Userindex As Integer, _
     
         If EnTesting And .Stats.ELV >= 18 Then
             Call WriteErrorMsg(Userindex, "Servidor en Testing por unos minutos, conectese con PJs de nivel menor a 18. No se conecte con Pjs que puedan resultar importantes por ahora pues pueden arruinarse.")
-            Call FlushBuffer(Userindex)
             Call CloseSocket(Userindex)
             Exit Sub
 
@@ -1906,7 +1895,7 @@ Sub ConnectUser(ByVal Userindex As Integer, _
         'el repositorio para hacer funcionar esto, es este: https://github.com/ao-libre/ao-api-server
         'Si no tienen interes en usarlo pueden desactivarlo en el Server.ini
         If ConexionAPI Then
-            Call ApiEndpointSendUserConnectedMessageDiscord(Name, .Desc, criminal(Userindex), ListaClases(.Clase))
+            Call ApiEndpointSendUserConnectedMessageDiscord(Name, .desc, criminal(Userindex), ListaClases(.clase))
         End If
 
         n = FreeFile
@@ -2060,13 +2049,13 @@ Sub ResetBasicUserInfo(ByVal Userindex As Integer)
         .Name = vbNullString
         .ID = 0
         .AccountHash = vbNullString
-        .Desc = vbNullString
+        .desc = vbNullString
         .DescRM = vbNullString
         .Pos.Map = 0
         .Pos.X = 0
         .Pos.Y = 0
         .ip = vbNullString
-        .Clase = 0
+        .clase = 0
         .Email = vbNullString
         .Genero = 0
         .Hogar = 0

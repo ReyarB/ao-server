@@ -412,9 +412,6 @@ Private Sub GameTimer()
 
                 End If 'UserLogged
                 
-                'Si quedo algo para mandar, lo mandamos.
-                Call FlushBuffer(iUserIndex)
-                
                 'Ya terminamos de procesar el paquete, sigamos recibiendo.
                 .Counters.PacketsTick = 0
                 

@@ -123,7 +123,7 @@ Sub InsertUserToDatabase(ByVal Userindex As Integer, _
         query = query & "free_skillpoints = " & .Stats.SkillPts & ", "
         query = query & "assigned_skillpoints = " & .Counters.AsignedSkills & ", "
         query = query & "pos_map = " & .Pos.Map & ", "
-        query = query & "pos_x = " & .Pos.x & ", "
+        query = query & "pos_x = " & .Pos.X & ", "
         query = query & "pos_y = " & .Pos.Y & ", "
         query = query & "body_id = " & .Char.body & ", "
         query = query & "head_id = " & .Char.Head & ", "
@@ -160,7 +160,7 @@ Sub InsertUserToDatabase(ByVal Userindex As Integer, _
 
         End If
 
-        UserId = val(Database_RecordSet.Fields(0).Value)
+        UserId = val(Database_RecordSet.Fields(0).value)
         Set Database_RecordSet = Nothing
 
         .ID = UserId
@@ -295,7 +295,7 @@ Sub UpdateUserToDatabase(ByVal Userindex As Integer, _
         query = query & "assigned_skillpoints = " & .Counters.AsignedSkills & ", "
         query = query & "pet_amount = " & .NroMascotas & ", "
         query = query & "pos_map = " & .Pos.Map & ", "
-        query = query & "pos_x = " & .Pos.x & ", "
+        query = query & "pos_x = " & .Pos.X & ", "
         query = query & "pos_y = " & .Pos.Y & ", "
         query = query & "last_map = " & .flags.lastMap & ", "
         query = query & "body_id = " & .Char.body & ", "
@@ -575,7 +575,7 @@ Sub LoadUserFromDatabase(ByVal Userindex As Integer)
         .Counters.AsignedSkills = Database_RecordSet!assigned_skillpoints
         .NroMascotas = Database_RecordSet!pet_amount
         .Pos.Map = Database_RecordSet!pos_map
-        .Pos.x = Database_RecordSet!pos_x
+        .Pos.X = Database_RecordSet!pos_x
         .Pos.Y = Database_RecordSet!pos_y
         .flags.lastMap = Database_RecordSet!last_map
         .OrigChar.body = Database_RecordSet!body_id
@@ -664,7 +664,7 @@ Sub LoadUserFromDatabase(ByVal Userindex As Integer)
 
             While Not Database_RecordSet.EOF
 
-                .Stats.UserAtributos(Database_RecordSet!Number) = Database_RecordSet!Value
+                .Stats.UserAtributos(Database_RecordSet!Number) = Database_RecordSet!value
                 .Stats.UserAtributosBackUP(Database_RecordSet!Number) = .Stats.UserAtributos(Database_RecordSet!Number)
 
                 Database_RecordSet.MoveNext
@@ -758,7 +758,7 @@ Sub LoadUserFromDatabase(ByVal Userindex As Integer)
 
             While Not Database_RecordSet.EOF
 
-                .Stats.UserSkills(Database_RecordSet!Number) = Database_RecordSet!Value
+                .Stats.UserSkills(Database_RecordSet!Number) = Database_RecordSet!value
                 .Stats.ExpSkills(Database_RecordSet!Number) = Database_RecordSet!Exp
                 .Stats.EluSkills(Database_RecordSet!Number) = Database_RecordSet!ELU
 
@@ -1723,7 +1723,7 @@ Public Function GetUserSkillsDatabase(ByVal UserName As String) As String
 
         While Not Database_RecordSet.EOF
 
-            GetUserSkillsDatabase = GetUserSkillsDatabase & "CHAR>" & SkillsNames(Database_RecordSet!Number) & " = " & Database_RecordSet!Value & vbCrLf
+            GetUserSkillsDatabase = GetUserSkillsDatabase & "CHAR>" & SkillsNames(Database_RecordSet!Number) & " = " & Database_RecordSet!value & vbCrLf
 
             Database_RecordSet.MoveNext
         Wend
@@ -2663,7 +2663,6 @@ Public Sub LoginAccountDatabase(ByVal Userindex As Integer, ByVal UserName As St
 
     If Database_RecordSet.BOF Or Database_RecordSet.EOF Then
         Call WriteErrorMsg(Userindex, "Error al cargar la cuenta.")
-        Call FlushBuffer(Userindex)
         Call CloseSocket(Userindex)
         Exit Sub
 
@@ -2720,8 +2719,8 @@ ErrorHandler:
 
 End Sub
 
-Public Function SanitizeNullValue(ByVal Value As Variant, _
+Public Function SanitizeNullValue(ByVal value As Variant, _
                                   ByVal defaultValue As Variant) As Variant
-    SanitizeNullValue = IIf(IsNull(Value), defaultValue, Value)
+    SanitizeNullValue = IIf(IsNull(value), defaultValue, value)
 
 End Function

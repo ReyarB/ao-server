@@ -62,7 +62,7 @@ Option Explicit
                                              ByVal lpClassName As String, _
                                              ByVal lpWindowName As String, _
                                              ByVal dwStyle As Long, _
-                                             ByVal x As Long, _
+                                             ByVal X As Long, _
                                              ByVal Y As Long, _
                                              ByVal nWidth As Long, _
                                              ByVal nHeight As Long, _
@@ -259,7 +259,7 @@ Public Function WndProc(ByVal hWnd As Long, _
 
         On Error Resume Next
 
-        Dim ret      As Long
+        Dim Ret      As Long
 
         Dim Tmp()    As Byte
 
@@ -328,16 +328,16 @@ Public Function WndProc(ByVal hWnd As Long, _
                         'create appropiate sized buffer
                         ReDim Preserve Tmp(SIZE_RCVBUF - 1) As Byte
                     
-                        ret = recv(S, Tmp(0), SIZE_RCVBUF, 0)
+                        Ret = recv(S, Tmp(0), SIZE_RCVBUF, 0)
 
                         ' Comparo por = 0 ya que esto es cuando se cierra
                         ' "gracefully". (mas abajo)
-                        If ret < 0 Then
+                        If Ret < 0 Then
                             UltError = Err.LastDllError
 
                             If UltError = WSAEMSGSIZE Then
                                 Debug.Print "WSAEMSGSIZE"
-                                ret = SIZE_RCVBUF
+                                Ret = SIZE_RCVBUF
                             Else
                                 Debug.Print "Error en Recv: " & GetWSAErrorString(UltError)
                                 Call LogApiSock("Error en Recv: N=" & n & " S=" & S & " Str=" & GetWSAErrorString(UltError))
@@ -351,13 +351,13 @@ Public Function WndProc(ByVal hWnd As Long, _
 
                             End If
 
-                        ElseIf ret = 0 Then
+                        ElseIf Ret = 0 Then
                             Call CloseSocketSL(n)
                             Call Cerrar_Usuario(n)
 
                         End If
                     
-                        ReDim Preserve Tmp(ret - 1) As Byte
+                        ReDim Preserve Tmp(Ret - 1) As Byte
                     
                         Call EventoSockRead(n, Tmp)
                 
@@ -390,7 +390,7 @@ End Function
 Public Function WsApiEnviar(ByVal Slot As Integer, ByRef str As String) As Long
     #If UsarQueSocket = 1 Then
 
-        Dim ret     As String
+        Dim Ret     As String
 
         Dim Retorno As Long
 
@@ -403,12 +403,12 @@ Public Function WsApiEnviar(ByVal Slot As Integer, ByRef str As String) As Long
         Retorno = 0
     
         If UserList(Slot).ConnID <> -1 And UserList(Slot).ConnIDValida Then
-            ret = send(ByVal UserList(Slot).ConnID, data(0), ByVal UBound(data()) + 1, ByVal 0)
+            Ret = send(ByVal UserList(Slot).ConnID, data(0), ByVal UBound(data()) + 1, ByVal 0)
 
-            If ret < 0 Then
-                ret = Err.LastDllError
+            If Ret < 0 Then
+                Ret = Err.LastDllError
 
-                If ret = WSAEWOULDBLOCK Then
+                If Ret = WSAEWOULDBLOCK Then
                 
                     ' WSAEWOULDBLOCK, put the data again in the outgoingData Buffer
                     Call UserList(Slot).outgoingData.WriteASCIIStringFixed(str)
@@ -434,7 +434,7 @@ End Function
 Public Sub LogApiSock(ByVal str As String)
     #If (UsarQueSocket = 1) Then
 
-        On Error GoTo errHandler
+        On Error GoTo ErrHandler
 
         Dim nfile As Integer
 
@@ -445,7 +445,7 @@ Public Sub LogApiSock(ByVal str As String)
 
         Exit Sub
 
-errHandler:
+ErrHandler:
 
     #End If
 
@@ -459,7 +459,7 @@ Public Sub EventoSockAccept(ByVal SockID As Long)
     
         Dim NewIndex  As Integer
 
-        Dim ret       As Long
+        Dim Ret       As Long
 
         Dim Tam       As Long, sa As sockaddr
 
@@ -480,9 +480,9 @@ Public Sub EventoSockAccept(ByVal SockID As Long)
     
         'Modificado por Maraxus
         'ret = WSAAccept(SockID, sa, Tam, AddressOf CondicionSocket, 0)
-        ret = accept(SockID, sa, Tam)
+        Ret = accept(SockID, sa, Tam)
 
-        If ret = INVALID_SOCKET Then
+        If Ret = INVALID_SOCKET Then
             i = Err.LastDllError
             Call LogCriticEvent("Error en Accept() API " & i & ": " & GetWSAErrorString(i))
             Exit Sub
@@ -502,7 +502,7 @@ Public Sub EventoSockAccept(ByVal SockID As Long)
         '    End If
         'End If
 
-        NuevoSock = ret
+        NuevoSock = Ret
     
         If setsockopt(NuevoSock, SOL_SOCKET, SO_LINGER, 0, 4) <> 0 Then
             i = Err.LastDllError
@@ -566,7 +566,6 @@ Public Sub EventoSockAccept(ByVal SockID As Long)
                 If BanIps.Item(i) = UserList(NewIndex).ip Then
                     'Call apiclosesocket(NuevoSock)
                     Call WriteErrorMsg(NewIndex, "Su IP se encuentra bloqueada en este servidor.")
-                    Call FlushBuffer(NewIndex)
                     Call SecurityIp.IpRestarConexion(sa.sin_addr)
                     Call WSApiCloseSocket(NuevoSock)
                     Exit Sub
